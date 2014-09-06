@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <LithiumSoftware_Akhilleus>
+            <version>0.1.0</version>
+        </LithiumSoftware_Akhilleus>
+    </modules>
+    <global>
+        <helpers>
+            <akhilleus>
+                <class>LithiumSoftware_Akhilleus_Helper</class>
+            </akhilleus>
+        </helpers>
+        <models>
+            <akhilleus>
+                <class>LithiumSoftware_Akhilleus_Model</class>
+                <resourceModel>akhilleus_mysql4</resourceModel>
+            </akhilleus>
+        </models>
+    </global>
+    <default>
+        <carriers>
+            <akhilleus>
+                <active>1</active>
+                <model>akhilleus/carrier_akhilleus</model>
+                <!--
+                <name>collectRates</name>
+                -->
+                <title>Serviços de Logística</title>
+                <!--
+                <description>description</description>
+                -->
+                <sort_order>0</sort_order>
+                <sallowspecific>0</sallowspecific>
+                <specificcountry>BR</specificcountry>
+            </akhilleus>
+        </carriers>
+    </default>
+</config> 
