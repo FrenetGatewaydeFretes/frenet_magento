@@ -17,6 +17,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected $_title				= NULL; // Título do método de envio
     protected $_from				= NULL; // CEP de origem
     protected $_to					= NULL; // CEP de destino
+    protected $_packageWeight		= NULL; // valor ajustado do pacote
 
 
     /**
@@ -63,7 +64,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 }
 
                 // Append shipping methods
-                $this->_appendShippingMethod($shipping_method, $shippingPrice, $delivery, $shipping_method_name);
+                $this->_appendShippingMethod($shipping_method, $shippingPrice, $delivery, $shipping_method_name, $request);
 
                 $existReturn = true;
             }
@@ -154,12 +155,48 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         };
     }
 
-    protected function _appendShippingMethod($shipping_method, $shippingPrice = 0, $delivery = 0, $shipping_method_name){
+
+    /*
+        TODO: Retirar texto fixo! Definir LeadTime
+    */
+    protected function _appendShippingMethod($shipping_method, $shippingPrice = 0, $delivery = 0, $shipping_method_name, Mage_Shipping_Model_Rate_Request $request){
         $method = Mage::getModel('shipping/rate_result_method');
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->_title);
 
         $method->setMethod($shipping_method);
+
+        /*
+        //Obter o maior LEADTIME dos produtos do request
+        $cartLeadTime = 0;
+        if ($request->getAllItems()) {
+            foreach ($request->getAllItems() as $item) {
+                if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
+                    continue;
+                }
+
+                if ($item->getHasChildren() && $item->isShipSeparately()) {
+                    foreach ($item->getChildren() as $child) {
+                        if ($child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
+                            $product_id = $child->getProductId();
+                            $productObj = Mage::getModel('catalog/product')->load($product_id);
+                            //verificar se a propriedade Leadtime existe
+                            //$productObj->offsetExists('Leadtime');
+                            $productLeadTime = $productObj->getLeadtime();
+                        }
+                    }
+                } else {
+                    $productId = $item->getProductId();
+                    $product = Mage::getModel('catalog/product')->load($productId);
+                    $productLeadTime = $product->getLeadtime();
+                }
+
+                if($cartLeadTime < $productLeadTime)
+                    $cartLeadTime=$productLeadTime;
+            }
+        }
+        */
+
         if($delivery  <= 0)
             $method->setMethodTitle($shipping_method_name);
         else
@@ -185,7 +222,39 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $this->_result = Mage::getModel('shipping/rate_result');
 
         $this->_value = $request->getBaseCurrency()->convert($request->getPackageValue(), $request->getPackageCurrency());
+
+        $this->_updatePackageWeight($request);
+
         $this->_weight = $this->_fixWeight($request->getPackageWeight());
+    }
+
+    protected function _updatePackageWeight(Mage_Shipping_Model_Rate_Request $request)
+    {
+        $this->_packageWeight = 0;
+
+        if ($request->getAllItems()) {
+            foreach ($request->getAllItems() as $item) {
+                if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
+                    continue;
+                }
+
+                if ($item->getHasChildren()) {
+                    foreach ($item->getChildren() as $child) {
+                        $product_id = $child->getProductId();
+                        $productObj = Mage::getModel('catalog/product')->load($product_id);
+
+                        $this->_packageWeight += $productObj->getWeight();
+                    }
+                } else {
+                    $this->_packageWeight +=  $item->getRowWeight();
+                }
+            }
+
+            if($request->getPackageWeight() > $this->_packageWeight)
+                $this->_packageWeight = $request->getPackageWeight();
+
+        }
+        $request->setPackageWeight($this->_packageWeight);
     }
 
     /**
