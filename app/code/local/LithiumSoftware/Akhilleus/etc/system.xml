@@ -37,6 +37,59 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </name>
+                        <login translate="label">
+                            <label>Usuário</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </login>
+                        <password translate="label">
+                            <label>Password</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </password>
+                        <use_default translate="label">
+                            <label>Utilizar dimensões padrão</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>6</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>O frete será calculado com as dimensões padrão preenchidas a seguir</comment>
+                        </use_default>
+                        <default_height translate="label">
+                            <label>Altura Padrão (cm)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Mínimo de 2 cm.]]></comment>
+                        </default_height>
+                        <default_length translate="label">
+                            <label>Comprimento Padrão (cm)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Mínimo de 16 cm.]]></comment>
+                        </default_length>
+                        <default_width translate="label">
+                            <label>Largura Padrão (cm)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Mínimo de 11 cm.]]></comment>
+                        </default_width>
                         <description translate="label">
                             <label>Description</label>
                             <frontend_type>textarea</frontend_type>
@@ -45,22 +98,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </description>
-                        <login translate="label">
-                            <label>Usuário</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>70</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </login>
-                        <password translate="label">
-                            <label>Password</label>
-                            <frontend_type>password</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </password>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>

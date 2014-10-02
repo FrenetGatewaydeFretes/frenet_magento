@@ -103,28 +103,44 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                         $client->setParameterGet('password', $this->getConfigData('password'));
 
              */
-            $this->_log('ConfigData : ' . $this->getConfigData('password'));
 
-            /*
-            // TODO: Está pegando as dimensões somente do primeiro produto do carrinho!
-            foreach($request->getAllItems() as $item){
-                $this->_length = $item->getLength();
-                $this->_width = $item->getWidth();
-                $this->_height = $item->getHeight();
+            if ($this->getConfigFlag('use_default'))
+            {
+                $this->_length = $this->getConfigData('default_length'); //16
+                $this->_width = $this->getConfigData('default_width'); //11
+                $this->_height = $this->getConfigData('default_height'); //2
+                $this->_diameter = 0;
+            }
+            else
+            {
+                $this->_length = 0;
+                $this->_width = 0;
+                $this->_height = 0;
                 $this->_diameter = 0;
 
-                break;
-            }
-            */
+                // Pega as maiores dimensões dos produtos do carrinho
+                foreach($request->getAllItems() as $item){
+                    if($item->getProduct()->getData('volume_comprimento') > $this->_length)
+                        $this->_length = $item->getProduct()->getData('volume_comprimento');
 
-            $this->_length = 16;
-            $this->_width = 11;
-            $this->_height = 2;
-            $this->_diameter = 0;
+                    if($item->getProduct()->getData('volume_largura') > $this->_width)
+                    $this->_width = $item->getProduct()->getData('volume_largura');
+
+                    if($item->getProduct()->getData('volume_altura') > $this->_height)
+                        $this->_height = $item->getProduct()->getData('volume_altura');
+
+                    $this->_diameter = 0;
+                }
+
+            }
+
+            $this->_log('altura ' . $this->_height);
+            $this->_log('largura ' . $this->_width);
+            $this->_log('comprimento ' . $this->_length);
 
             $service_param = array (
-                'userName' => "mania",
-                'password' => ".M@n1@",
+                'userName' => $this->getConfigData('login'),
+                'password' => $this->getConfigData('password'),
                 'sellerCEP' => $this->_from,
                 'recipientCEP' => $this->_to,
                 'shipmentInvoiceValue' => $this->_value,
