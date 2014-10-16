@@ -6,6 +6,17 @@
         </LithiumSoftware_Akhilleus>
     </modules>
     <global>
+        <sales>
+            <quote>
+                <item>
+                    <product_attributes>
+                        <volume_altura/>
+                        <volume_comprimento/>
+                        <volume_largura/>
+                    </product_attributes>
+                </item>
+            </quote>
+        </sales>
         <helpers>
             <akhilleus>
                 <class>LithiumSoftware_Akhilleus_Helper</class>
@@ -17,6 +28,16 @@
                 <resourceModel>akhilleus_mysql4</resourceModel>
             </akhilleus>
         </models>
+        <resources>
+            <akhilleus_setup>
+                <setup>
+                    <module>LithiumSoftware_Akhilleus</module>
+                </setup>
+                <connection>
+                    <use>directory_setup</use>
+                </connection>
+            </akhilleus_setup>
+        </resources>
     </global>
     <default>
         <carriers>
@@ -30,6 +51,15 @@
                 <!--
                 <description>description</description>
                 -->
+
+                <!-- VOLUME -->
+                <altura_padrao>2</altura_padrao>
+                <comprimento_padrao>16</comprimento_padrao>
+                <largura_padrao>11</largura_padrao>
+                <altura_sent>2</altura_sent>
+                <comprimento_sent>16</comprimento_sent>
+                <largura_sent>11</largura_sent>
+
                 <sort_order>0</sort_order>
                 <sallowspecific>0</sallowspecific>
                 <specificcountry>BR</specificcountry>

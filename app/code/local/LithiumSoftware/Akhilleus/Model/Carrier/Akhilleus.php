@@ -18,6 +18,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected $_from				= NULL; // CEP de origem
     protected $_to					= NULL; // CEP de destino
     protected $_packageWeight		= NULL; // valor ajustado do pacote
+    protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
+    protected $_addDeliveryDays     = NULL; // Adiciona n dias ao prazo de entrega
 
 
     /**
@@ -54,14 +56,15 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
                 $this->_log("Percorrendo os serviços retornados");
 
-                $shippingPrice    = floatval(str_replace(",", ".", (string) $servicos->ShippingPrice));
+                if ($servicos->ServiceCode . '' == '') {
+                    continue;
+                }
+
+                $shippingPrice = floatval(str_replace(",", ".", (string) $servicos->ShippingPrice));
                 $delivery = (int) $servicos->DeliveryTime;
                 $shipping_method = $servicos->ServiceCode;
                 $shipping_method_name = $servicos->ServiceDescription;
 
-                if ($shippingPrice <= 0) {
-                    continue;
-                }
 
                 // Append shipping methods
                 $this->_appendShippingMethod($shipping_method, $shippingPrice, $delivery, $shipping_method_name, $request);
@@ -171,10 +174,6 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         };
     }
 
-
-    /*
-        TODO: Retirar texto fixo! Definir LeadTime
-    */
     protected function _appendShippingMethod($shipping_method, $shippingPrice = 0, $delivery = 0, $shipping_method_name, Mage_Shipping_Model_Rate_Request $request){
         $method = Mage::getModel('shipping/rate_result_method');
         $method->setCarrier($this->_code);
@@ -182,7 +181,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
         $method->setMethod($shipping_method);
 
-        /*
+
         //Obter o maior LEADTIME dos produtos do request
         $cartLeadTime = 0;
         if ($request->getAllItems()) {
@@ -196,27 +195,37 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                         if ($child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
                             $product_id = $child->getProductId();
                             $productObj = Mage::getModel('catalog/product')->load($product_id);
+
                             //verificar se a propriedade Leadtime existe
-                            //$productObj->offsetExists('Leadtime');
-                            $productLeadTime = $productObj->getLeadtime();
+                            if($productObj->offsetExists('leadtime'))
+                                $productLeadTime = $productObj->getleadtime();
                         }
                     }
                 } else {
                     $productId = $item->getProductId();
-                    $product = Mage::getModel('catalog/product')->load($productId);
-                    $productLeadTime = $product->getLeadtime();
+                    $productObj = Mage::getModel('catalog/product')->load($productId);
+
+                    //verificar se a propriedade Leadtime existe
+                    if($productObj->offsetExists('leadtime'))
+                        $productLeadTime = $productObj->getleadtime();
                 }
 
                 if($cartLeadTime < $productLeadTime)
                     $cartLeadTime=$productLeadTime;
             }
         }
-        */
 
-        if($delivery  <= 0)
+        $this->_log('Leadtime: ' . $cartLeadTime);
+
+        if ($this->_showDelivery && $delivery > 0){
+            $this->_log('Deliivery: ' . $delivery);
+            $this->_log('Show Delivery: ' . $this->_showDelivery);
+
+            $method->setMethodTitle(sprintf($this->getConfigData('msgprazo'), $shipping_method_name, (int)($delivery + $this->_addDeliveryDays + $cartLeadTime)));
+        }
+        else {
             $method->setMethodTitle($shipping_method_name);
-        else
-            $method->setMethodTitle(sprintf('%s - Em média %d dia(s)',$shipping_method_name, $delivery));
+        }
 
         $method->setPrice($shippingPrice);
         $method->setCost($shippingPrice);
@@ -236,6 +245,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $this->_title = $this->getConfigData('title');
         $this->_weightType = $this->getConfigData('weight_type');
         $this->_result = Mage::getModel('shipping/rate_result');
+        $this->_showDelivery = $this->getConfigData('show_delivery');
+        $this->_addDeliveryDays = $this->getConfigData('add_delivery_days');
 
         $this->_value = $request->getBaseCurrency()->convert($request->getPackageValue(), $request->getPackageCurrency());
 
