@@ -335,10 +335,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $new = trim($zipcode);
         $new = preg_replace('/[^0-9\s]/', '', $new);
 
-        if(!preg_match("/^[0-9]{7,8}$/", $new)){
+        if(!preg_match("/^[0-9]{8}$/", $new)){
             return false;
-        } elseif(preg_match("/^[0-9]{7}$/", $new)){ // tratamento para CEP com 7 d�gitos
-            $new = "0" . $new;
         }
 
         return $new;
