@@ -47,10 +47,17 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
         if ($wsReturn !== false) {
 
+            $this->_log("Qtd serviços: " . count($wsReturn->RateResult->ShippingSevicesArray->ShippingSevices));
+
             // Check if exist return from Webservices
             $existReturn = false;
 
-            foreach($wsReturn->RateResult->ShippingSevicesArray->ShippingSevices as $servicos){
+            if(count($wsReturn->RateResult->ShippingSevicesArray->ShippingSevices)==1)
+                $servicosArray[0] = $wsReturn->RateResult->ShippingSevicesArray->ShippingSevices;
+            else
+                $servicosArray = $wsReturn->RateResult->ShippingSevicesArray->ShippingSevices;
+
+            foreach($servicosArray as $servicos){
 
                 // Get Webservices error
 
@@ -184,6 +191,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
         //Obter o maior LEADTIME dos produtos do request
         $cartLeadTime = 0;
+        $productLeadTime=0;
         if ($request->getAllItems()) {
             foreach ($request->getAllItems() as $item) {
                 if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
@@ -218,7 +226,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $this->_log('Leadtime: ' . $cartLeadTime);
 
         if ($this->_showDelivery && $delivery > 0){
-            $this->_log('Deliivery: ' . $delivery);
+            $this->_log('Delivery: ' . $delivery);
             $this->_log('Show Delivery: ' . $this->_showDelivery);
 
             $method->setMethodTitle(sprintf($this->getConfigData('msgprazo'), $shipping_method_name, (int)($delivery + $this->_addDeliveryDays + $cartLeadTime)));
