@@ -4,12 +4,26 @@
         <carriers  translate="label" module="akhilleus">
             <groups>
                 <akhilleus translate="label">
-                    <label>Akhilleus</label>
+                    <label>Frenet - Gateway de fretes</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>0</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
+                    <comment>
+                        <![CDATA[ <div style="background: #FFF; border: 1px solid #0091DB;">
+                        <div style="padding:10px;float: left;text-align: left; vertical-align:bottom;">
+                        <a href="http://www.frenet.com.br" target="_blank">
+                        <img src="http://admin.frenet.com.br/Content/images/Frenet_logo_painel.png" style="float: left;" />
+                        </a>
+                        <b>
+                        Para configurar as transportadoras as quais deseja obter cotações de frete, obter usuário e senha de acesso,
+                        cadastrar regras de frete, acesse o <a href="http://painel.frenet.com.br" target="_blank">painel administrativo Frenet</a>
+                        </div>
+                        </b>
+                        <div class="clear"></div>
+                        </div> ]]>
+                    </comment>
                     <model>akhilleus/carrier_akhilleus</model>
                     <fields>
                         <active translate="label">
@@ -29,14 +43,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </title>
-                        <name translate="label">
-                            <label>Method Name</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </name>
                         <login translate="label">
                             <label>Usuário</label>
                             <frontend_type>text</frontend_type>
@@ -116,14 +122,6 @@
                             <show_in_store>1</show_in_store>
                             <comment>Adicionará mais dias aos prazos de entrega fornecidos.</comment>
                         </add_delivery_days>
-                        <description translate="label">
-                            <label>Description</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>76</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </description>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>

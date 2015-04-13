@@ -44,15 +44,10 @@
             <akhilleus>
                 <active>1</active>
                 <model>akhilleus/carrier_akhilleus</model>
-                <!--
-                <name>collectRates</name>
-                -->
-                <title>Serviços de Logística</title>
-                <!--
-                <description>description</description>
-                -->
-
+                <title>Serviços de Entrega</title>
+                <msgprazo>%s - Em média %d dia(s)</msgprazo>
                 <!-- VOLUME -->
+                <use_default>1</use_default>
                 <altura_padrao>2</altura_padrao>
                 <comprimento_padrao>16</comprimento_padrao>
                 <largura_padrao>11</largura_padrao>
