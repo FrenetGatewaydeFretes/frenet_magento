@@ -1,4 +1,4 @@
-![Frenet_logo_painel.png](https://bitbucket.org/repo/8o6zno/images/1280161971-Frenet_logo_painel.png)
+![Frenet_logo_painel.png](http://painel.frenet.com.br/Content/images/Frenet_logo_painel.png)
 # [Frenet - Gateway de fretes para e-commerce](http://www.www.frenet.com.br) #
 
 ## -- Módulo Magento -- ##
@@ -15,14 +15,14 @@
 **Instalação manual**
 **********************************************************************************************
 
-* Baixe aqui a &uacute;ltima versão aqui, descompacte o arquivo baixado e copie a pasta app para a pasta principal da sua loja Magento
+* Baixe aqui a última versão aqui, descompacte o arquivo baixado e copie a pasta app para a pasta principal da sua loja Magento
 
 * Acesse a área administrativa de sua loja e limpe o cache em: Sistema > Gerenciamento de Cache
 
 **Configuração**
 **********************************************************************************************
 * Acesse a área administrativa de sua loja e configure a nova forma de entrega instalada: Sistema > Configuração > Formas de Entrega > Frenet - Gateway de Fretes (conforme imagem a seguir)
-![frenet_magento_admin.png](https://bitbucket.org/repo/8o6zno/images/1487690917-frenet_magento_admin.png)
+![frenet_magento_admin.png](https://s3-sa-east-1.amazonaws.com/magentoakhilleus/frenet_magento_admin.png)
 
 * Configure os campos
 
@@ -33,7 +33,7 @@
  3. **Usuário** - Usuário de acesso ao webservice do Frenet (acesse o painel administrativo, em Dados Cadastrais, obtenha esta informação conforme imagem abaixo)
 
  4. **Senha** - Senha de acesso ao webservice do Frenet (acesse o painel administrativo, em Dados Cadastrais, obtenha esta informação conforme imagem abaixo)
-![frenet_magento_admin_access_key.png](https://bitbucket.org/repo/8o6zno/images/3386854313-frenet_magento_admin_access_key.png)
+![frenet_magento_admin_access_key.png](https://s3-sa-east-1.amazonaws.com/magentoakhilleus/frenet_magento_admin_access_key.png)
 
   5. **Utilizar dimensões padrão** - Caso esta opção seja marcada com **Sim**, o frete será calculado com as dimensões padrão preenchidas nos próximos campos. Caso seja preenchido com **Não**, o cálculo será baseado nas dimensões reais dos produtos cadastrados.
 
