@@ -100,19 +100,11 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
      */
     protected function _getWebServicesReturn(Mage_Shipping_Model_Rate_Request $request)
     {
-
-        //$filename = $this->getConfigData('url_ws_lai');
         $url    = 'http://services.lithiumsoftware.com.br/logistics/ShippingQuoteWS.asmx?wsdl';
 
         try {
 
             $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
-
-            /*
-             *          $client->setParameterGet('userName', $this->getConfigData('login'));
-                        $client->setParameterGet('password', $this->getConfigData('password'));
-
-             */
 
             if ($this->getConfigFlag('use_default'))
             {
@@ -247,7 +239,6 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
             return false;
         }
 
-        //if (!$this->_checkCountry($request)) return false;
         if (!$this->_checkZipCode($request)) return false;
 
         $this->_title = $this->getConfigData('title');
