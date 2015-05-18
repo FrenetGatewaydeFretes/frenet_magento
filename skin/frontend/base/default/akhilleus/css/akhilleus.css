@@ -1,0 +1,8 @@
+.akhilleus-box-master{width:500px;height:60px}
+.akhilleus-box-master input{float:left!important;margin-top:26px!important}
+.akhilleus-box-checkout{color:#333;background-color:#f5f6f6;width:450px;max-width:500px;height:50px;border:1px solid #ccc;border-radius:10px;font-family:Verdana,Geneva,sans-serif;position:relative;display:table;float:left;cursor:pointer}
+.akhilleus-box-cart{color:#333;width:340px;max-width:340px;height:50px;font-family:Verdana,Geneva,sans-serif;position:relative;display:table;float:left;cursor:pointer}
+.akhilleus-logo-frenet{float:left}.akhilleus-prazo{float:left;margin-left:15px;font-size:10px}
+.akhilleus-preco{float:right;font-weight:700;font-size:14px;margin-top:17px;margin-right: 8px;}
+.akhilleus-icon-truck{float:left;margin-top:7px}
+.akhilleus-text-prazo{float:left;margin-top:20px;margin-left:7px}

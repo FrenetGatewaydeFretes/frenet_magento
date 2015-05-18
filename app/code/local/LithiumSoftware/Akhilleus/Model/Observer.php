@@ -6,26 +6,33 @@
  * Time: 14:38
  */
 
-class LithiumSoftware_Akhilleus_Model_Observer extends Varien_Object {
+class LithiumSoftware_Akhilleus_Model_Observer  extends Mage_Core_Model_Abstract {
 
-    public function SaveShippingData($observer)
-    {
-        $event = $observer->getEvent();
-        $order = $event->getOrder();
+    public function SaveShippingResultLog($observer){
+        try
+        {
+            $shipment = $observer->getEvent()->getShipment();
+            $order = $shipment->getOrder();
 
-        Mage::log('Akhilleus: SaveShippingData - ShippingMethod: ' . $order->getShippingMethod());
-        Mage::log('Akhilleus: SaveShippingData - ShippingDescription: ' . $order->getShippingDescription());
+            Mage::log('Akhilleus: SaveShippingResultLog - ShippingMethod: ' . $order->getShippingMethod());
+            Mage::log('Akhilleus: SaveShippingResultLog - ShippingDescription: ' . $order->getShippingDescription());
 
-        $sellerCEP = Mage::getStoreConfig('shipping/origin/postcode');
-        $recipientCEP = $order->getShippingAddress()->getPostcode();
-        $shipmentInvoiceValue = $order->getSubtotal();
-        $shippingAmount = $order->getShippingAmount();
-        $shipmentWeight = $order->getWeight();
-        $deliveryTime = preg_replace("/[^0-9]/","",$order->getShippingDescription());
-        $shippingMethod = str_replace("akhilleus_", "",$order->getShippingMethod());
+            $sellerCEP = Mage::getStoreConfig('shipping/origin/postcode');
+            $recipientCEP = $order->getShippingAddress()->getPostcode();
+            $shipmentInvoiceValue = $order->getSubtotal();
+            $shippingAmount = $order->getShippingAmount();
+            $shipmentWeight = $order->getWeight();
+            $deliveryTime = preg_replace("/[^0-9]/","",$order->getShippingDescription());
+            $shippingMethod = str_replace("akhilleus_", "",$order->getShippingMethod());
 
-        // Call Webservices
-        $wsReturn = $this->_getWebServicesReturn($sellerCEP, $recipientCEP, $shipmentInvoiceValue, $shippingAmount, $deliveryTime, $shipmentWeight, $shippingMethod);
+            // Call Webservices
+            $wsReturn = $this->_getWebServicesReturn($sellerCEP, $recipientCEP, $shipmentInvoiceValue, $shippingAmount, $deliveryTime, $shipmentWeight, $shippingMethod);
+
+        } catch (Exception $e) {
+            $this->_log('SaveShippingResultLog - Error: ' . $e->getMessage(), __LINE__);
+        }
+
+        return $this;
     }
 
     /**
@@ -57,8 +64,8 @@ class LithiumSoftware_Akhilleus_Model_Observer extends Varien_Object {
             );
 
             $this->_log('Chamada do webservices - ' .
-                'userName' . $login . 'password' . $password .
-                'Origem: ' .$sellerCEP . ' Destino: ' . $recipientCEP . ' Peso: ' . $shipmentWeight . ' ValorDeclarado: ' . $shipmentInvoiceValue .
+                'userName' . $login . ' Password' . $password .
+                ' Origem: ' .$sellerCEP . ' Destino: ' . $recipientCEP . ' Peso: ' . $shipmentWeight . ' ValorDeclarado: ' . $shipmentInvoiceValue .
                 ' Valor do Frete: ' . $shippingAmount . ' Prazo de entrega: ' . $deliveryTime . ' Metodo de entrega: ' . $shippingMethod);
 
             $content = $client->__soapCall("SaveShippingResultLog", array($service_param));

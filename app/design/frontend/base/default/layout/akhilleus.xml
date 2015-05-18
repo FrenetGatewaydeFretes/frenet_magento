@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_onepage_shippingmethod>
+        <remove name="right"/>
+        <remove name="left"/>
+        <block type="checkout/onepage_shipping_method_available" name="root" output="toHtml" template="akhilleus/checkout/onepage/shipping_method/available.phtml" />
+    </checkout_onepage_shippingmethod>
+
+    <checkout_cart_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>akhilleus/js/jquery.maskedinput.min.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>akhilleus/css/akhilleus.css</name></action>
+        </reference>
+        <reference name="content">
+            <block name="checkout.cart">
+                <block type="checkout/cart_shipping" name="checkout.cart.shipping" as="shipping" template= "akhilleus/checkout/cart/shipping.phtml"/>
+            </block>
+        </reference>
+    </checkout_cart_index>
+</layout>

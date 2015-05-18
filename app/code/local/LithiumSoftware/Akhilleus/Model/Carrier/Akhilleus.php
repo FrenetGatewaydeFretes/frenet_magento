@@ -63,7 +63,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
                 $this->_log("Percorrendo os serviços retornados");
 
-                if ($servicos->ServiceCode . '' == '') {
+                if (! isset($servicos->ServiceCode) || $servicos->ServiceCode . '' == '')
+                {
                     continue;
                 }
 

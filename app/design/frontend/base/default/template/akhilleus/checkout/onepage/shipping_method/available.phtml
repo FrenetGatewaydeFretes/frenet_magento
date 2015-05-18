@@ -1,0 +1,100 @@
+<style>
+    .akhilleus-box-master{width:500px;height:60px}
+    .akhilleus-box-master input{float:left!important;margin-top:26px!important}
+    .akhilleus-box-checkout{color:#333;background-color:#f5f6f6;width:450px;max-width:500px;height:50px;border:1px solid #ccc;border-radius:10px;font-family:Verdana,Geneva,sans-serif;position:relative;display:table;float:left;cursor:pointer}
+    .akhilleus-box-cart{color:#333;width:340px;max-width:340px;height:50px;font-family:Verdana,Geneva,sans-serif;position:relative;display:table;float:left;cursor:pointer}
+    .akhilleus-logo-frenet{float:left}.akhilleus-prazo{float:left;margin-left:15px;font-size:10px}
+    .akhilleus-preco{float:right;font-weight:700;font-size:14px;margin-top:17px;margin-right: 8px;}
+    .akhilleus-icon-truck{float:left;margin-top:7px}
+    .akhilleus-text-prazo{float:left;margin-top:20px;margin-left:7px}
+</style>
+
+<?php /** @var $this Mage_Checkout_Block_Onepage_Shipping_Method_Available */ ?>
+<?php $_shippingRateGroups = $this->getShippingRates(); ?>
+<?php if (!$_shippingRateGroups): ?>
+    <p><?php echo $this->__('Sorry, no quotes are available for this order at this time.') ?></p>
+<?php else: ?>
+    <dl class="sp-methods">
+        <?php $shippingCodePrice = array(); ?>
+        <?php $_sole = count($_shippingRateGroups) == 1; foreach ($_shippingRateGroups as $code => $_rates): ?>
+            <dt><?php echo $this->escapeHtml($this->getCarrierName($code)) ?></dt>
+            <dd>
+                <ul>
+                    <?php $_sole = $_sole && count($_rates) == 1; foreach ($_rates as $_rate): ?>
+                        <?php $shippingCodePrice[] = "'".$_rate->getCode()."':".(float)$_rate->getPrice(); ?>
+                        <li>
+                        <div class="akhilleus-box-master">
+                            <?php if ($_rate->getErrorMessage()): ?>
+                                <ul class="messages"><li class="error-msg"><ul><li><?php echo $this->escapeHtml($_rate->getErrorMessage()) ?></li></ul></li></ul>
+                            <?php else: ?>
+                                <?php if ($_sole) : ?>
+                                    <span class="no-display"><input name="shipping_method" type="radio" value="<?php echo $_rate->getCode() ?>" id="s_method_<?php echo $_rate->getCode() ?>" checked="checked" /></span>
+                                <?php else: ?>
+                                <input name="shipping_method" type="radio" value="<?php echo $_rate->getCode() ?>" id="s_method_<?php echo $_rate->getCode() ?>"<?php if($_rate->getCode()===$this->getAddressShippingMethod()) echo ' checked="checked"' ?> class="radio"/>
+
+                            <label for="s_method_<?php echo $_rate->getCode() ?>" style="background-color: #fff !important;">
+                                <div class="akhilleus-box-checkout">
+                                    <div class="akhilleus-logo-frenet"><img src="https://s3-sa-east-1.amazonaws.com/magentoakhilleus/rodocerto.png" width="125" height="50" /></div>
+                                    <div class="akhilleus-info">
+                                        <div class="akhilleus-prazo">
+                                            <div class="akhilleus-icon-truck"><img src="https://s3-sa-east-1.amazonaws.com/magentoakhilleus/truck-icon.png" width="28" height="30" /></div>
+                                            <div class="akhilleus-text-prazo"><?php echo $this->escapeHtml($_rate->getMethodTitle()) ?></div>
+                                        </div>
+                                        <div class="akhilleus-preco">
+                                            <?php if ($_rate->getCode() === $this->getAddressShippingMethod()): ?>
+                                                <script type="text/javascript">
+                                                    //<![CDATA[
+                                                    lastPrice = <?php echo (float)$_rate->getPrice(); ?>;
+                                                    //]]>
+                                                </script>
+                                            <?php endif; ?>
+
+                                            <?php endif; ?>
+
+                                            <?php $_excl = $this->getShippingPrice($_rate->getPrice(), $this->helper('tax')->displayShippingPriceIncludingTax()); ?>
+                                            <?php $_incl = $this->getShippingPrice($_rate->getPrice(), true); ?>
+                                            <?php echo $_excl; ?>
+                                            <?php if ($this->helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
+                                                (<?php echo $this->__('Incl. Tax'); ?> <?php echo $_incl; ?>)
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                            <?php endif ?>
+                        </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </dd>
+        <?php endforeach; ?>
+    </dl>
+    <script type="text/javascript">
+        //<![CDATA[
+        <?php if (!empty($shippingCodePrice)): ?>
+        var shippingCodePrice = {<?php echo implode(',',$shippingCodePrice); ?>};
+        <?php endif; ?>
+
+        $$('input[type="radio"][name="shipping_method"]').each(function(el){
+            Event.observe(el, 'click', function(){
+                if (el.checked == true) {
+                    var getShippingCode = el.getValue();
+                    <?php if (!empty($shippingCodePrice)): ?>
+                    var newPrice = shippingCodePrice[getShippingCode];
+                    if (!lastPrice) {
+                        lastPrice = newPrice;
+                        quoteBaseGrandTotal += newPrice;
+                    }
+                    if (newPrice != lastPrice) {
+                        quoteBaseGrandTotal += (newPrice-lastPrice);
+                        lastPrice = newPrice;
+                    }
+                    <?php endif; ?>
+                    checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+                    return false;
+                }
+            });
+        });
+        //]]>
+    </script>
+<?php endif; ?>

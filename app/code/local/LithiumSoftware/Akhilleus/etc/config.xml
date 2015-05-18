@@ -39,17 +39,26 @@
             </akhilleus_setup>
         </resources>
         <events>
-            <sales_order_place_after>
+            <sales_order_shipment_save_after>
                 <observers>
                     <send_statistics>
                         <type>singleton</type>
                         <class>LithiumSoftware_Akhilleus_Model_Observer</class>
-                        <method>SaveShippingData</method>
+                        <method>SaveShippingResultLog</method>
                     </send_statistics>
                 </observers>
-            </sales_order_place_after>
+            </sales_order_shipment_save_after>
         </events>
     </global>
+    <frontend>
+        <layout>
+            <updates>
+                <akhilleus>
+                    <file>akhilleus.xml</file>
+                </akhilleus>
+            </updates>
+        </layout>
+    </frontend>
     <default>
         <carriers>
             <akhilleus>
