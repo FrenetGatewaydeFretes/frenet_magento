@@ -1,12 +1,12 @@
-![Frenet_logo_painel.png](http://painel.frenet.com.br/Content/images/Frenet_logo_painel.png)
+![Frenet_logo_painel.png](https://painel.frenet.com.br/Content/images/Frenet_logo_painel.png)
 # [Frenet - Gateway de fretes para e-commerce](http://www.www.frenet.com.br) #
 
 ## -- Módulo Magento -- ##
 
 ### Links ###
-* [Painel Administrativo](http://painel.frenet.com.br)
-* [Sistema de Tickets](http://suporte.lithiumsoftware.com.br)
+* [Painel Administrativo](https://painel.frenet.com.br)
 * [Magento Connect](http://www.magentocommerce.com/magento-connect/gateway-de-fretes-frenet.html)
+* [contato@frenet.com.br](mailto:contato@frenet.com.br)
 
 ## Instalação ##
 
