@@ -1,8 +1,23 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * This source file is subject to the MIT License.
+ * It is also available through http://opensource.org/licenses/MIT
+ *
+ * @category  Akhilleus
+ * @package   LithiumSoftware_Akhilleus
+ * @author    LithiumSoftware <contato@lithiumsoftware.com.br>
+ * @copyright 2015 Lithium Software
+ * @license   http://opensource.org/licenses/MIT MIT
+ */
+-->
 <config>
     <modules>
         <LithiumSoftware_Akhilleus>
-            <version>0.1.0</version>
+            <version>1.0.0</version>
+            <depends>
+                <Mage_Shipping/>
+            </depends>
         </LithiumSoftware_Akhilleus>
     </modules>
     <global>
@@ -78,6 +93,10 @@
                 <sort_order>0</sort_order>
                 <sallowspecific>0</sallowspecific>
                 <specificcountry>BR</specificcountry>
+
+                <weight_type>kg</weight_type>
+
+                <url_ws>http://services.lithiumsoftware.com.br/logistics/ShippingQuoteWS.asmx?wsdl</url_ws>
             </akhilleus>
         </carriers>
     </default>

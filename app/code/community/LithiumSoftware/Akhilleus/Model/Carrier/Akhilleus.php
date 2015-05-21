@@ -1,4 +1,14 @@
 <?php
+/**
+ * This source file is subject to the MIT License.
+ * It is also available through http://opensource.org/licenses/MIT
+ *
+ * @category  Akhilleus
+ * @package   LithiumSoftware_Akhilleus
+ * @author    LithiumSoftware <contato@lithiumsoftware.com.br>
+ * @copyright 2015 Lithium Software
+ * @license   http://opensource.org/licenses/MIT MIT
+ */
 class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     extends Mage_Shipping_Model_Carrier_Abstract
     implements Mage_Shipping_Model_Carrier_Interface
@@ -101,7 +111,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
      */
     protected function _getWebServicesReturn(Mage_Shipping_Model_Rate_Request $request)
     {
-        $url    = 'http://services.lithiumsoftware.com.br/logistics/ShippingQuoteWS.asmx?wsdl';
+        $url    = $this->getConfigData('url_ws');
 
         try {
 
@@ -399,12 +409,12 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     }
 
     /**
-     * Get allowed shipping methods
+     * Returns the allowed carrier methods
      *
      * @return array
      */
     public function getAllowedMethods()
     {
-        return array($this->_code=>$this->getConfigData('name'));
+        return array($this->_code => $this->getConfigData('name'));
     }
 }

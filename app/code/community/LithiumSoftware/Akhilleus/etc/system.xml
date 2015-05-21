@@ -1,4 +1,16 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * This source file is subject to the MIT License.
+ * It is also available through http://opensource.org/licenses/MIT
+ *
+ * @category  Akhilleus
+ * @package   LithiumSoftware_Akhilleus
+ * @author    LithiumSoftware <contato@lithiumsoftware.com.br>
+ * @copyright 2015 Lithium Software
+ * @license   http://opensource.org/licenses/MIT MIT
+ */
+-->
 <config>
     <sections>
         <carriers  translate="label" module="akhilleus">
@@ -18,7 +30,7 @@
                         </a>
                         <b>
                         Para configurar as transportadoras as quais deseja obter cotações de frete, obter usuário e senha de acesso,
-                        cadastrar regras de frete, acesse o <a href="http://painel.frenet.com.br" target="_blank">painel administrativo Frenet</a>
+                        cadastrar regras de frete, acesse o <a href="https://painel.frenet.com.br" target="_blank">painel administrativo Frenet</a>
                         </div>
                         </b>
                         <div class="clear"></div>
@@ -96,6 +108,19 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Mínimo de 11 cm.]]></comment>
                         </default_width>
+                        <weight_type translate="label">
+                            <label>Formato do Peso</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>LithiumSoftware_Akhilleus_Model_Source_WeightType</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Formato do peso dos produtos.</comment>
+                            <tooltip>O formato do peso irá implicar na maneira como o mesmo é cadastrado no produto, por
+                                exemplo, 1 Kg no formato "Kilo" será "1.000", já em "Gramas" será "1000.000".
+                            </tooltip>
+                        </weight_type>
                         <show_delivery translate="label">
                             <label>Exibir Prazo de Entrega</label>
                             <frontend_type>select</frontend_type>
