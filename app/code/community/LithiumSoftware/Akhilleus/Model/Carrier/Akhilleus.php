@@ -27,6 +27,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected $_title				= NULL; // Título do método de envio
     protected $_from				= NULL; // CEP de origem
     protected $_to					= NULL; // CEP de destino
+    protected $_recipientDocument	= NULL; // CPF / CNPJ do destinatario
     protected $_packageWeight		= NULL; // valor ajustado do pacote
     protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
     protected $_addDeliveryDays     = NULL; // Adiciona n dias ao prazo de entrega
@@ -53,19 +54,19 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected function _getQuotes(Mage_Shipping_Model_Rate_Request $request)
     {
         // Call Webservices
-        $wsReturn = $this->_getWebServicesReturn($request);
+        $wsReturn = $this->_getWebServicesQuoteReturn($request);
 
         if ($wsReturn !== false) {
 
-            $this->_log("Qtd serviços: " . count($wsReturn->RateResult->ShippingSevicesArray->ShippingSevices));
+            $this->_log("Qtd serviços: " . count($wsReturn->GetShippingQuoteResult->ShippingSevicesArray->ShippingSevices));
 
             // Check if exist return from Webservices
             $existReturn = false;
 
-            if(count($wsReturn->RateResult->ShippingSevicesArray->ShippingSevices)==1)
-                $servicosArray[0] = $wsReturn->RateResult->ShippingSevicesArray->ShippingSevices;
+            if(count($wsReturn->GetShippingQuoteResult->ShippingSevicesArray->ShippingSevices)==1)
+                $servicosArray[0] = $wsReturn->GetShippingQuoteResult->ShippingSevicesArray->ShippingSevices;
             else
-                $servicosArray = $wsReturn->RateResult->ShippingSevicesArray->ShippingSevices;
+                $servicosArray = $wsReturn->GetShippingQuoteResult->ShippingSevicesArray->ShippingSevices;
 
             foreach($servicosArray as $servicos){
 
@@ -73,8 +74,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
                 $this->_log("Percorrendo os serviços retornados");
 
-                if (! isset($servicos->ServiceCode) || $servicos->ServiceCode . '' == '')
-                {
+                if (!isset($servicos->ServiceCode) || $servicos->ServiceCode . '' == '' || !isset($servicos->ShippingPrice)) {
                     continue;
                 }
 
@@ -83,6 +83,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $shipping_method = $servicos->ServiceCode;
                 $shipping_method_name = $servicos->ServiceDescription;
 
+				$this->_log("Preço " . $shippingPrice);
 
                 // Append shipping methods
                 $this->_appendShippingMethod($shipping_method, $shippingPrice, $delivery, $shipping_method_name, $request);
@@ -103,6 +104,153 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         // Success
         return $this->_result;
     }
+
+    /**
+     * Get Webservices return
+     *
+     * @return bool|SimpleXMLElement[]
+     */
+    protected function _getWebServicesQuoteReturn(Mage_Shipping_Model_Rate_Request $request)
+    {
+        $url    = $this->getConfigData('url_ws');
+
+        try {
+
+            $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
+
+            if ($this->getConfigFlag('use_default'))
+            {
+                $this->_length = $this->getConfigData('default_length'); //16
+                $this->_width = $this->getConfigData('default_width'); //11
+                $this->_height = $this->getConfigData('default_height'); //2
+                $this->_diameter = 0;
+            }
+            else
+            {
+                $this->_length = 0;
+                $this->_width = 0;
+                $this->_height = 0;
+                $this->_diameter = 0;
+
+                // Pega as maiores dimensões dos produtos do carrinho
+                foreach($request->getAllItems() as $item){
+                    if($item->getProduct()->getData('volume_comprimento') > $this->_length)
+                        $this->_length = $item->getProduct()->getData('volume_comprimento');
+
+                    if($item->getProduct()->getData('volume_largura') > $this->_width)
+                        $this->_width = $item->getProduct()->getData('volume_largura');
+
+                    if($item->getProduct()->getData('volume_altura') > $this->_height)
+                        $this->_height = $item->getProduct()->getData('volume_altura');
+
+                    $this->_diameter = 0;
+                }
+            }
+
+            // gerar o array de produtos
+            $shippingItemArray = array();
+            $count = 0;
+            foreach($request->getAllItems() as $item){
+                $shippingItem = new stdClass();
+                $shippingItem->Weight = $item->getWeight();
+                if ($this->getConfigFlag('use_default'))
+                {
+                    $shippingItem->Length = $this->getConfigData('default_length'); //16
+                    $shippingItem->Width =  $this->getConfigData('default_width'); //11
+                    $shippingItem->Height = $this->getConfigData('default_height'); //2
+                }
+                else{
+                    $shippingItem->Length = $item->getProduct()->getData('volume_comprimento');
+                    $shippingItem->Height = $item->getProduct()->getData('volume_altura');
+                    $shippingItem->Width = $item->getProduct()->getData('volume_largura');
+                }
+                $shippingItem->Diameter = 0;
+                $shippingItem->SKU = $item->getProduct()->getSku();
+
+                $categoryIds = $item->getProduct()->getCategoryIds();
+                $result = '';
+
+                foreach ($categoryIds as $catId) {
+                    $category = Mage::getModel('catalog/category')->load($catId);
+
+                    if($category)
+                    {
+                        $coll = $category->getResourceCollection();
+                        $pathIds = $category->getPathIds();
+                        $coll->addAttributeToSelect('name');
+                        $coll->addAttributeToFilter('entity_id', array('in' => $pathIds));
+
+                        foreach ($coll as $cat) {
+                            if(strpos($result, $cat->getName())=== false)
+                                $result .= $cat->getName().'|';
+                        }
+                    }
+                }
+
+                $shippingItem->Category = $result;
+
+                if($item->getProduct()->getData('fragile'))
+                    $shippingItem->isFragile = $item->getProduct()->getData('fragile');
+                else
+                    $shippingItem->isFragile=false;
+
+                $shippingItemArray[$count] = $shippingItem;
+                $count++;
+            }
+
+            $service_param = array (
+                'quoteRequest' => array(
+                    'Username' => $this->getConfigData('login'),
+                    'Password' => $this->getConfigData('password'),
+                    'SellerCEP' => $this->_from,
+                    'RecipientCEP' => $this->_to,
+                    'RecipientDocument' => $this->_recipientDocument,
+                    'ShipmentInvoiceValue' => $this->_value,
+                    'ShippingItemArray' => $shippingItemArray
+                )
+            );
+
+            /*
+            $this->_log('Chamada do webservices - ');
+            foreach($service_param as $key => $value)
+            {
+                $this->_log($key." service_param ". $value);
+            }
+
+            foreach($shippingItemArray as $shippingItem)
+            {
+                $this->_log("Peso ". $shippingItem->Weight);
+                $this->_log("Comprimento ". $shippingItem->Length);
+                $this->_log("Altura ". $shippingItem->Height);
+                $this->_log("Largura ". $shippingItem->Width);
+                $this->_log("Diametro ". $shippingItem->Diameter);
+                $this->_log("SKU ". $shippingItem->SKU);
+                $this->_log("Categoria ". $shippingItem->Category);
+                $this->_log("Fragil ". $shippingItem->isFragile);
+            }
+            */
+
+            $content = $client->__soapCall("GetShippingQuote", array($service_param));
+
+            $this->_log($client->__getLastRequest());
+            $this->_log($client->__getLastResponse());
+
+            if ($content == "") {
+                throw new Exception("No XML returned [" . __LINE__ . "]");
+            }
+
+            return $content;
+
+        } catch (Exception $e) {
+            //URL Error
+            $this->_throwError('urlerror', 'URL Error - ' . $e->getMessage() . ' request ' . $client->__getLastRequest(), __LINE__);
+            return false;
+        };
+    }
+    protected function _getCategories(){
+
+    }
+
 
     /**
      * Get Webservices return
@@ -170,6 +318,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
             $content = $client->__soapCall("Rate", array($service_param));
 
+            $this->_log($client->__getLastRequest());
 
             if ($content == "") {
                 throw new Exception("No XML returned [" . __LINE__ . "]");
@@ -263,6 +412,9 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $this->_updatePackageWeight($request);
 
         $this->_weight = $this->_fixWeight($request->getPackageWeight());
+
+        // obter o documento do destinatário - algumas transportadoras exigem
+        $this->_recipientDocument = '';
     }
 
     protected function _updatePackageWeight(Mage_Shipping_Model_Rate_Request $request)
