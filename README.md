@@ -1,5 +1,5 @@
 ![Frenet_logo_painel.png](https://painel.frenet.com.br/Content/images/Frenet_logo_painel.png)
-# [Frenet - Gateway de fretes para e-commerce](http://www.www.frenet.com.br) #
+# [Frenet - Gateway de fretes para e-commerce](http://www.frenet.com.br) #
 
 ## -- Módulo Magento -- ##
 
