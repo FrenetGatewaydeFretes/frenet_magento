@@ -154,7 +154,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $productObj = Mage::getModel('catalog/product')->load($product_id);
 
                 $shippingItem = new stdClass();
-                $shippingItem->Weight = $item->getWeight();
+                $shippingItem->Weight = $productObj->getWeight() * $item->getQty();
                 if ($this->getConfigFlag('use_default'))
                 {
                     $shippingItem->Length = $this->getConfigData('default_length'); //16
@@ -167,9 +167,9 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                     $shippingItem->Width = ($productObj->getVolume_largura()>0 ? $productObj->getVolume_largura() : $this->getConfigData('default_width'));
                 }
                 $shippingItem->Diameter = 0;
-                $shippingItem->SKU = $item->getProduct()->getSku();
+                $shippingItem->SKU = $productObj->getSku();
 
-                $categoryIds = $item->getProduct()->getCategoryIds();
+                $categoryIds = $productObj->getCategoryIds();
                 $result = '';
 
                 foreach ($categoryIds as $catId) {
@@ -466,4 +466,127 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     {
         return array($this->_code => $this->getConfigData('name'));
     }
+
+    /**
+     * Check if current carrier offer support to tracking
+     *
+     * @return bool true
+     */
+    public function isTrackingAvailable()
+    {
+        return true;
+    }
+
+    public function getTrackingInfo($tracking)
+    {
+        $result = $this->getTracking($tracking);
+        if ($result instanceof Mage_Shipping_Model_Tracking_Result) {
+            if ($trackings = $result->getAllTrackings()) {
+                return $trackings[0];
+            }
+        } elseif (is_string($result) && !empty($result)) {
+            return $result;
+        }
+
+        return false;
+    }
+
+    public function getTracking($trackings)
+    {
+        $this->_result = Mage::getModel('shipping/tracking_result');
+        foreach ((array) $trackings as $code) {
+            $this->_getTrackingFromWS($code);
+        }
+        return $this->_result;
+    }
+
+    protected function _getTrackingFromWS($tracking)
+    {
+        $url    = $this->getConfigData('url_ws');
+        $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
+        $orderId = Mage::getModel("sales/order")->getCollection()->getLastItem()->getIncrementId();
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+
+        $shippingServiceCode = str_replace($this->_code . '_','', $order->getShippingMethod());
+
+        $invoiceNumber='';
+        if ($order->hasInvoices()) {
+            foreach ($order->getInvoiceCollection() as $inv) {
+                $invoiceNumber += $inv->getIncrementId() . '|';
+            }
+        }
+
+        $this->_log('Shipping Service Code: ' . $shippingServiceCode);
+        $service_param = array (
+            'trackingRequest' => array(
+                'Username' => $this->getConfigData('login'),
+                'Password' => $this->getConfigData('password'),
+                'TrackingNumber' => $tracking,
+                'InvoiceNumber' => $invoiceNumber,
+                'RecipientDocument' => '',
+                'OrderNumber' => $orderId,
+                'ShippingServiceCode' => $shippingServiceCode
+            )
+        );
+        $this->_log($url);
+        $wsReturn = $client->__soapCall("GetTrackingInfo", array($service_param));
+
+        $this->_log($client->__getLastRequest());
+        $this->_log($client->__getLastResponse());
+
+        if ($wsReturn == "") {
+            throw new Exception("No XML returned [" . __LINE__ . "]");
+        }
+
+        if ($wsReturn !== false) {
+            if(isset($wsReturn->GetTrackingInfoResult->TrackingEvents))
+            {
+                if(count($wsReturn->GetTrackingInfoResult->TrackingEvents->TrackingEvent)==1)
+                    $trackingEventArray[0] = $wsReturn->GetTrackingInfoResult->TrackingEvents->TrackingEvent;
+                else
+                    $trackingEventArray = $wsReturn->GetTrackingInfoResult->TrackingEvents->TrackingEvent;
+
+
+                $progress = array();
+                foreach($trackingEventArray as $trackingEvent){
+                    $this->_log("Percorrendo os eventos");
+
+                    $datetime = explode(' ',$trackingEvent->EventDateTime);
+                    $locale   = new Zend_Locale('pt_BR');
+                    $date     = '';
+                    $date     = new Zend_Date($datetime[0], 'dd/MM/YYYY', $locale);
+
+                    $trackingProgress = array(
+                        'deliverydate'     => $date->toString('YYYY-MM-dd'),
+                        'deliverytime'     => $datetime[1],
+                        'deliverylocation' => $trackingEvent->EventLocation,
+                        'activity'         => $trackingEvent->EventDescription
+                    );
+                    $progress[] = $trackingProgress;
+                }
+
+                $trackData                   = $progress[0];
+                $trackData['progressdetail'] = $progress;
+
+                $carrierTitle='';
+                if(isset($wsReturn->GetTrackingInfoResult->ServiceDescrition))
+                    $carrierTitle = $wsReturn->GetTrackingInfoResult->ServiceDescrition;
+
+                $track = Mage::getModel('shipping/tracking_result_status');
+                $track->setTracking($tracking)
+                    ->setCarrierTitle($carrierTitle)
+                    ->addData($trackData);
+
+                $this->_result->append($track);
+                return true;
+            }
+            else{
+                $error = Mage::getModel('shipping/tracking_result_error');
+                $this->_result->append($error);
+                return false;
+            }
+        }
+    }
+
+
 }

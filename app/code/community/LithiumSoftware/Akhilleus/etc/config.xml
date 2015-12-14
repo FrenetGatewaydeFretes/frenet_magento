@@ -14,7 +14,7 @@
 <config>
     <modules>
         <LithiumSoftware_Akhilleus>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
             <depends>
                 <Mage_Shipping/>
             </depends>
@@ -53,6 +53,17 @@
                 </connection>
             </akhilleus_setup>
         </resources>
+        <events>
+            <sales_order_shipment_save_after>
+                <observers>
+                    <send_statistics>
+                        <type>singleton</type>
+                        <class>LithiumSoftware_Akhilleus_Model_Observer</class>
+                        <method>SaveShippingResultLog</method>
+                    </send_statistics>
+                </observers>
+            </sales_order_shipment_save_after>
+        </events>
     </global>
     <default>
         <carriers>
