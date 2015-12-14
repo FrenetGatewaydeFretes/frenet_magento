@@ -515,15 +515,21 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $invoiceNumber += $inv->getIncrementId() . '|';
             }
         }
+        
+        $customer_id = $order->getCustomerId();
+        $customer = Mage::getModel('customer/customer')->load($customer_id);
+        $recipientDocument = $customer->getData('taxvat');
 
         $this->_log('Shipping Service Code: ' . $shippingServiceCode);
+        $this->_log('CPF: ' . $recipientDocument);
+
         $service_param = array (
             'trackingRequest' => array(
                 'Username' => $this->getConfigData('login'),
                 'Password' => $this->getConfigData('password'),
                 'TrackingNumber' => $tracking,
                 'InvoiceNumber' => $invoiceNumber,
-                'RecipientDocument' => '',
+                'RecipientDocument' => $recipientDocument,
                 'OrderNumber' => $orderId,
                 'ShippingServiceCode' => $shippingServiceCode
             )
