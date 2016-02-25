@@ -502,10 +502,20 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
     protected function _getTrackingFromWS($tracking)
     {
+        $sales_flat_shipment_track = Mage::getSingleton('core/resource')->getTableName('sales_flat_shipment_track');
+        $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $sql = 'SELECT order_id FROM ' . $sales_flat_shipment_track . ' WHERE track_number = ?';
+        $tracking_table = $connection->fetchAll($sql, $tracking);
+        $orderId='';
+        foreach ($tracking_table as $track){
+            $orderId = $track['order_id'];
+            break;
+        }
+
         $url    = $this->getConfigData('url_ws');
         $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
-        $orderId = Mage::getModel("sales/order")->getCollection()->getLastItem()->getIncrementId();
-        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+        //$orderId = Mage::getModel("sales/order")->getCollection()->getLastItem()->getIncrementId();
+        $order = Mage::getModel('sales/order')->load($orderId);
 
         $shippingServiceCode = str_replace($this->_code . '_','', $order->getShippingMethod());
 
@@ -530,11 +540,11 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 'TrackingNumber' => $tracking,
                 'InvoiceNumber' => $invoiceNumber,
                 'RecipientDocument' => $recipientDocument,
-                'OrderNumber' => $orderId,
+                'OrderNumber' => $order->getIncrementId(),
                 'ShippingServiceCode' => $shippingServiceCode
             )
         );
-        $this->_log($url);
+        $this->_log(json_encode($service_param));
         $wsReturn = $client->__soapCall("GetTrackingInfo", array($service_param));
 
         $this->_log($client->__getLastRequest());
