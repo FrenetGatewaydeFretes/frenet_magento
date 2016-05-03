@@ -32,6 +32,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
     protected $_addDeliveryDays     = NULL; // Adiciona n dias ao prazo de entrega
 
+    protected $_simpleProducts = array();
+    protected $_productsQty = array();
 
     /**
      * Collect rates for this shipping method based on information in $request
@@ -149,12 +151,18 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
             // gerar o array de produtos
             $shippingItemArray = array();
             $count = 0;
-            foreach($request->getAllItems() as $item){
-                $product_id = $item->getProductId();
-                $productObj = Mage::getModel('catalog/product')->load($product_id);
+            $this->getSimpleProducts($request->getAllItems());
+            $productsCount = count ($this->_simpleProducts);
+            $j = 0;
+            for ($i = 0; $i < $productsCount; $i ++)
+            {
+                $productObj = $this->_simpleProducts[$i];
+
+                //$this->_log(json_encode($productObj->getData()));
+                //$this->_log('Quantidade: ' . $this->_productsQty[$i]);
 
                 $shippingItem = new stdClass();
-                $shippingItem->Weight = $this->_fixWeight($productObj->getWeight()) * $item->getQty();
+                $shippingItem->Weight = $this->_fixWeight($productObj->getWeight()) * $this->_productsQty[$i];
                 if ($this->getConfigFlag('use_default'))
                 {
                     $shippingItem->Length = $this->getConfigData('default_length'); //16
@@ -191,8 +199,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
                 $shippingItem->Category = $result;
 
-                if($item->getProduct()->getData('fragile'))
-                    $shippingItem->isFragile = $item->getProduct()->getData('fragile');
+                if($productObj->getFragile())
+                    $shippingItem->isFragile = $productObj->getFragile();
                 else
                     $shippingItem->isFragile=false;
 
@@ -602,6 +610,50 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 return false;
             }
         }
+    }
+
+    private function getSimpleProducts($items)
+    {
+        $j = 0;
+        foreach ($items as $child)
+        {
+            $product_id = $child->getProductId ();
+            $product = Mage::getModel ('catalog/product')->load ($product_id);
+            $type_id = $product->getTypeId ();
+            if (strcmp ($type_id, 'simple')) continue;
+
+            $qty = $this->_getQty ($child);
+
+            $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
+
+            $this->_simpleProducts [$j] = $product;
+            $this->_productsQty [$j] = (int)$qty;
+            $j = $j + 1;
+        }
+
+        return $this;
+    }
+
+    private function _getQty ($item)
+    {
+        $qty = 0;
+
+        $parentItem = $item->getParentItem ();
+        $targetItem = !empty ($parentItem) && $parentItem->getId () > 0 ? $parentItem : $item;
+
+        if ($targetItem instanceof Mage_Sales_Model_Quote_Item)
+        {
+            $qty = $targetItem->getQty ();
+        }
+        elseif ($targetItem instanceof Mage_Sales_Model_Order_Item)
+        {
+            $qty = $targetItem->getShipped () ? $targetItem->getShipped () : $targetItem->getQtyInvoiced ();
+            if ($qty == 0) {
+                $qty = $targetItem->getQtyOrdered();
+            }
+        }
+
+        return $qty;
     }
 
 
