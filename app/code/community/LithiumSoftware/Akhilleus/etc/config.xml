@@ -14,7 +14,7 @@
 <config>
     <modules>
         <LithiumSoftware_Akhilleus>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
             <depends>
                 <Mage_Shipping/>
             </depends>
