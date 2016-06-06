@@ -27,6 +27,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected $_title				= NULL; // Título do método de envio
     protected $_from				= NULL; // CEP de origem
     protected $_to					= NULL; // CEP de destino
+    protected $_destCountry         = NULL; // IATA do pais destino
     protected $_recipientDocument	= NULL; // CPF / CNPJ do destinatario
     protected $_packageWeight		= NULL; // valor ajustado do pacote
     protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
@@ -214,6 +215,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                     'Password' => $this->getConfigData('password'),
                     'SellerCEP' => $this->_from,
                     'RecipientCEP' => $this->_to,
+                    'RecipientCountry' => $this->_destCountry,
                     'RecipientDocument' => $this->_recipientDocument,
                     'ShipmentInvoiceValue' => $this->_value,
                     'ShippingItemArray' => $shippingItemArray
@@ -420,31 +422,22 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $this->_from = $this->_formatZip(Mage::getStoreConfig('shipping/origin/postcode', $this->getStore()));
         $this->_to = $this->_formatZip($request->getDestPostcode());
 
+        if ($request->getDestCountryId()) {
+            $this->_destCountry = $request->getDestCountryId();
+        } else {
+            $this->_destCountry = 'BR';
+        }
+
+        $this->_log('Country ID ' . $this->_destCountry);
+
         if(!$this->_from){
             $this->_log('Erro com CEP de origem');
             return false;
         }
 
-        if(!$this->_to){
+        if(!$this->_to && $this->_destCountry == 'BR'){
             $this->_log('Erro com CEP de destino');
             $this->_throwError('zipcodeerror', 'CEP Inválido', __LINE__);
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Verifica se o país está dentro da área atendida
-     *
-     * @param Mage_Shipping_Model_Rate_Request $request
-     * @return boolean
-     */
-    protected function _checkCountry(Mage_Shipping_Model_Rate_Request $request) {
-        $from = Mage::getStoreConfig('shipping/origin/country_id', $this->getStore());
-        $to = $request->getDestCountryId();
-        if ($from != "BR" || $to != "BR"){
-            $this->_log('Fora da área de atendimento');
             return false;
         }
 
