@@ -163,7 +163,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 //$this->_log('Quantidade: ' . $this->_productsQty[$i]);
 
                 $shippingItem = new stdClass();
-                $shippingItem->Weight = $this->_fixWeight($productObj->getWeight()) * $this->_productsQty[$i];
+                $shippingItem->Weight = $this->_fixWeight($productObj->getWeight());
                 if ($this->getConfigFlag('use_default'))
                 {
                     $shippingItem->Length = $this->getConfigData('default_length'); //16
@@ -205,8 +205,11 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 else
                     $shippingItem->isFragile=false;
 
-                $shippingItemArray[$count] = $shippingItem;
-                $count++;
+                for($z =0; $z < $this->_productsQty[$i]; $z++){
+                    $tmp = clone($shippingItem);
+                    $shippingItemArray[$count] = $tmp;
+                    $count++;
+                }
             }
 
             $service_param = array (
