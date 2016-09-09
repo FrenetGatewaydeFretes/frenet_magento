@@ -254,37 +254,23 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         //Obter o maior LEADTIME dos produtos do request
         $cartLeadTime = 0;
         $productLeadTime=0;
-        if ($request->getAllItems()) {
-            foreach ($request->getAllItems() as $item) {
-                if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
-                    continue;
-                }
 
-                if ($item->getHasChildren() && $item->isShipSeparately()) {
-                    foreach ($item->getChildren() as $child) {
-                        if ($child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
-                            $product_id = $child->getProductId();
-                            $productObj = Mage::getModel('catalog/product')->load($product_id);
+        if(!isset($this->_simpleProducts) || count ($this->_simpleProducts) == 0)
+            $this->getSimpleProducts($request->getAllItems());
 
-                            //verificar se a propriedade Leadtime existe
-                            if($productObj->offsetExists('leadtime'))
-                                $productLeadTime = $productObj->getleadtime();
-                        }
-                    }
-                } else {
-                    $productId = $item->getProductId();
-                    $productObj = Mage::getModel('catalog/product')->load($productId);
+        $productsCount = count ($this->_simpleProducts);
+        $j = 0;
+        for ($i = 0; $i < $productsCount; $i ++)
+        {
+            $productObj = $this->_simpleProducts[$i];
+            //verificar se a propriedade Leadtime existe
+            if($productObj->offsetExists('leadtime'))
+                $productLeadTime = $productObj->getleadtime();
 
-                    //verificar se a propriedade Leadtime existe
-                    if($productObj->offsetExists('leadtime'))
-                        $productLeadTime = $productObj->getleadtime();
-                }
-
-                if($cartLeadTime < $productLeadTime)
-                    $cartLeadTime=$productLeadTime;
-            }
+            if($cartLeadTime < $productLeadTime)
+                $cartLeadTime=$productLeadTime;
         }
-
+        
         $this->_log('Leadtime: ' . $cartLeadTime);
 
         if ($this->_showDelivery && ((int)($delivery + $this->_addDeliveryDays + $cartLeadTime) > 0)){
