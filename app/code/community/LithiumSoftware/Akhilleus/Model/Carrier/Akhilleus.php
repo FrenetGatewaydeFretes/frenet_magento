@@ -557,7 +557,14 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 foreach($trackingEventArray as $trackingEvent){
                     $this->_log("Percorrendo os eventos");
 
-                    $datetime = explode(' ',$trackingEvent->EventDateTime);
+                    if(isset($trackingEvent->EventDateTime))
+                    {
+                        $datetime = explode(' ',$trackingEvent->EventDateTime);
+                    }
+                    else
+                    {
+                        $datetime = explode(' ',Zend_Date::now()->toString('dd-MM-yyyy HH:mm:ss'));
+                    }
                     $locale   = new Zend_Locale('pt_BR');
                     $date     = '';
                     $date     = new Zend_Date($datetime[0], 'dd/MM/YYYY', $locale);
