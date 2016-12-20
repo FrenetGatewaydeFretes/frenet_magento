@@ -24,17 +24,20 @@
 
 * Rode os comandos no seu terminal do SO (linux)
 
-    composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
-    composer require frenet/magento dev-master
+```
+$ composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+$ composer require frenet/magento dev-master
+```
 
 **Instalação Modman**
 **********************************************************************************************
 
 * Rode os comandos no seu terminal do SO (linux)
 
-    modgit init
-    modgit clone magento-frenet git@github.com:FrenetGatewaydeFretes/frenet_magento.git
-
+```
+$ modgit init
+$ modgit clone magento-frenet git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+```
 **Configuração**
 **********************************************************************************************
 * Acesse a área administrativa de sua loja e configure a nova forma de entrega instalada: Sistema > Configuração > Formas de Entrega > Frenet - Gateway de Fretes (conforme imagem a seguir)
