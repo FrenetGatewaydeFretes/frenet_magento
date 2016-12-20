@@ -22,7 +22,7 @@
 **Instalação Composer**
 **********************************************************************************************
 
-* Rode os comandos no seu terminal do SO (linux)
+* Rode os comandos no seu terminal
 
 ```
 $ composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
@@ -32,7 +32,7 @@ $ composer require frenet/magento dev-master
 **Instalação Modman**
 **********************************************************************************************
 
-* Rode os comandos no seu terminal do SO (linux)
+* Rode os comandos no seu terminal
 
 ```
 $ modgit init
