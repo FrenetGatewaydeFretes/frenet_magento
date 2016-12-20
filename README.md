@@ -22,14 +22,18 @@
 **Instalação Composer**
 **********************************************************************************************
 
-* composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
-* composer require frenet/magento dev-master
+* Rode os comandos no seu terminal do SO (linux)
+
+    composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+    composer require frenet/magento dev-master
 
 **Instalação Modman**
 **********************************************************************************************
 
-* modgit init
-* modgit clone magento-frenet git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+* Rode os comandos no seu terminal do SO (linux)
+
+    modgit init
+    modgit clone magento-frenet git@github.com:FrenetGatewaydeFretes/frenet_magento.git
 
 **Configuração**
 **********************************************************************************************
