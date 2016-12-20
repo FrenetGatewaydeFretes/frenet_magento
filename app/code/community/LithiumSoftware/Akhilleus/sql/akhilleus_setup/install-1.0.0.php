@@ -66,7 +66,7 @@ $setup->addAttribute('catalog_product', $codigo, $config);
 $codigo = 'leadtime';
 $config = array(
     'position' => 1,
-    'required' => 1,
+    'required' => 0,
     'label'    => 'Lead time (dias)',
     'type'     => 'int',
     'input'    => 'text',
@@ -86,7 +86,7 @@ $config = array(
     'input'    => 'boolean',
     'apply_to' => 'simple,bundle,grouped,configurable',
     'default'  => 0,
-    'required' => 1,
+    'required' => 0,
     'note'     => 'Produto contém vidro ou outros materiais frágeis? (Para cálculo de frete)'
 );
 
