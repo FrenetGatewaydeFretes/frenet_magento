@@ -5,7 +5,7 @@
 
 ### Links ###
 * [Painel Administrativo](https://painel.frenet.com.br)
-* [Magento Connect](http://www.magentocommerce.com/magento-connect/gateway-de-fretes-frenet.html)
+* [Magento Connect](https://www.magentocommerce.com/magento-connect/frenet-freight-shipping-module.html)
 * [contato@frenet.com.br](mailto:contato@frenet.com.br)
 
 ## Instalação ##
