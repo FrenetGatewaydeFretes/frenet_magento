@@ -117,7 +117,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected function _getWebServicesQuoteReturn(Mage_Shipping_Model_Rate_Request $request)
     {
         $url    = $this->getConfigData('url_ws');
-        $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
+        $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1, "cache_wsdl" => WSDL_CACHE_NONE));
 
         try {
             if ($this->getConfigFlag('use_default'))
