@@ -205,11 +205,9 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 else
                     $shippingItem->isFragile=false;
 
-                for($z =0; $z < $this->_productsQty[$i]; $z++){
-                    $tmp = clone($shippingItem);
-                    $shippingItemArray[$count] = $tmp;
-                    $count++;
-                }
+                $shippingItem->Quantity = $this->_productsQty[$i];
+                $shippingItemArray[$count] = $shippingItem;
+                $count++;
             }
 
             $service_param = array (
@@ -609,15 +607,59 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
             $product_id = $child->getProductId ();
             $product = Mage::getModel ('catalog/product')->load ($product_id);
             $type_id = $product->getTypeId ();
-            if (strcmp ($type_id, 'simple')) continue;
 
-            $qty = $this->_getQty ($child);
+            if (strcmp ($type_id, 'simple')) {
+                //$this->_log("continue " . $product->getTypeId());
+                continue;
+            }
 
-            $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
+            //VERIFICA SE O PRODUTO É "FILHO" DE UM BUNDLE
+            $parent_ids = Mage::getModel('bundle/product_type')->getParentIdsByChild($child->getProductId());
 
-            $this->_simpleProducts [$j] = $product;
-            $this->_productsQty [$j] = (int)$qty;
-            $j = $j + 1;
+            if(!empty($parent_ids))
+            {
+                $product_bundle = Mage::getModel ('catalog/product')->load ($parent_ids[0]);
+
+                $selections = $product_bundle->getTypeInstance(true)
+                    ->getSelectionsCollection($product_bundle->getTypeInstance(true)
+                        ->getOptionsIds($product_bundle), $product_bundle);
+
+                foreach($selections as $selection){
+                    if($product_id == $selection->getProductId())
+                    {
+                        $product = Mage::getModel ('catalog/product')->load ($selection->getProductId());
+                        $qty = $selection->getSelectionQty();
+
+                        $qty_bundle = 1;
+                        foreach ($items as $child) {
+                            if($parent_ids[0] == $child->getProductId ()){
+                                $qty_bundle= $this->_getQty ($child);
+                                break;
+                            }
+                        }
+
+                        //$this->_log("qty_bundle: " . $qty_bundle);
+
+                        $this->_simpleProducts [$j] = $product;
+                        $this->_productsQty [$j] = (int) $qty * $qty_bundle;
+                        $j = $j + 1;
+
+                        //$this->_log(json_encode($product->getData()));
+                        //$this->_log("Loop Selections qty: " . $qty);
+                    }
+                }
+            }
+            else
+            {
+                $qty = $this->_getQty ($child);
+
+                $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
+
+                $this->_simpleProducts [$j] = $product;
+                $this->_productsQty [$j] = (int)$qty;
+                $j = $j + 1;
+            }
+
         }
 
         return $this;
