@@ -17,19 +17,19 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
     protected $_result = null;
 
-    protected $_value				= NULL; // Valor do pedido
-    protected $_weightType			= NULL; // Unidade de medida
-    protected $_weight				= NULL; // Peso total do pedido
-    protected $_length				= NULL; // Tamanho
-    protected $_height				= NULL; // Altura
-    protected $_width				= NULL; // Largura
-    protected $_diameter		    = NULL; // Diametro
-    protected $_title				= NULL; // Título do método de envio
-    protected $_from				= NULL; // CEP de origem
-    protected $_to					= NULL; // CEP de destino
+    protected $_value               = NULL; // Valor do pedido
+    protected $_weightType          = NULL; // Unidade de medida
+    protected $_weight              = NULL; // Peso total do pedido
+    protected $_length              = NULL; // Tamanho
+    protected $_height              = NULL; // Altura
+    protected $_width               = NULL; // Largura
+    protected $_diameter            = NULL; // Diametro
+    protected $_title               = NULL; // Título do método de envio
+    protected $_from                = NULL; // CEP de origem
+    protected $_to                  = NULL; // CEP de destino
     protected $_destCountry         = NULL; // IATA do pais destino
-    protected $_recipientDocument	= NULL; // CPF / CNPJ do destinatario
-    protected $_packageWeight		= NULL; // valor ajustado do pacote
+    protected $_recipientDocument   = NULL; // CPF / CNPJ do destinatario
+    protected $_packageWeight       = NULL; // valor ajustado do pacote
     protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
     protected $_addDeliveryDays     = NULL; // Adiciona n dias ao prazo de entrega
 
@@ -135,7 +135,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $this->_diameter = 0;
 
                 // Pega as maiores dimensões dos produtos do carrinho
-                foreach($request->getAllItems() as $item){
+                foreach($this->_getRequestItems($request) as $item){
                     if($item->getProduct()->getData('volume_comprimento') > $this->_length)
                         $this->_length = $item->getProduct()->getData('volume_comprimento');
 
@@ -152,7 +152,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
             // gerar o array de produtos
             $shippingItemArray = array();
             $count = 0;
-            $this->getSimpleProducts($request->getAllItems());
+            $this->getSimpleProducts($this->_getRequestItems($request));
             $productsCount = count ($this->_simpleProducts);
             $j = 0;
             for ($i = 0; $i < $productsCount; $i ++)
@@ -160,7 +160,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $productObj = $this->_simpleProducts[$i];
 
                 //$this->_log(json_encode($productObj->getData()));
-                //$this->_log('Quantidade: ' . $this->_productsQty[$i]);
+                $this->_log('Quantidade: ' . $this->_productsQty[$i]);
 
                 $shippingItem = new stdClass();
                 $shippingItem->Weight = $this->_fixWeight($productObj->getWeight());
@@ -254,7 +254,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $productLeadTime=0;
 
         if(!isset($this->_simpleProducts) || count ($this->_simpleProducts) == 0)
-            $this->getSimpleProducts($request->getAllItems());
+            $this->getSimpleProducts($this->_getRequestItems($request));
 
         $productsCount = count ($this->_simpleProducts);
         $j = 0;
@@ -315,8 +315,8 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     {
         $this->_packageWeight = 0;
 
-        if ($request->getAllItems()) {
-            foreach ($request->getAllItems() as $item) {
+        if ($this->_getRequestItems($request)) {
+            foreach ($this->_getRequestItems($request) as $item) {
                 if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
                     continue;
                 }
@@ -607,58 +607,12 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
             $product_id = $child->getProductId ();
             $product = Mage::getModel ('catalog/product')->load ($product_id);
             $type_id = $product->getTypeId ();
-
-            if (strcmp ($type_id, 'simple')) {
-                //$this->_log("continue " . $product->getTypeId());
-                continue;
-            }
-
-            //VERIFICA SE O PRODUTO É "FILHO" DE UM BUNDLE
-            $parent_ids = Mage::getModel('bundle/product_type')->getParentIdsByChild($child->getProductId());
-
-            if(!empty($parent_ids))
-            {
-                $product_bundle = Mage::getModel ('catalog/product')->load ($parent_ids[0]);
-
-                $selections = $product_bundle->getTypeInstance(true)
-                    ->getSelectionsCollection($product_bundle->getTypeInstance(true)
-                        ->getOptionsIds($product_bundle), $product_bundle);
-
-                foreach($selections as $selection){
-                    if($product_id == $selection->getProductId())
-                    {
-                        $product = Mage::getModel ('catalog/product')->load ($selection->getProductId());
-                        $qty = $selection->getSelectionQty();
-
-                        $qty_bundle = 1;
-                        foreach ($items as $child) {
-                            if($parent_ids[0] == $child->getProductId ()){
-                                $qty_bundle= $this->_getQty ($child);
-                                break;
-                            }
-                        }
-
-                        //$this->_log("qty_bundle: " . $qty_bundle);
-
-                        $this->_simpleProducts [$j] = $product;
-                        $this->_productsQty [$j] = (int) $qty * $qty_bundle;
-                        $j = $j + 1;
-
-                        //$this->_log(json_encode($product->getData()));
-                        //$this->_log("Loop Selections qty: " . $qty);
-                    }
-                }
-            }
-            else
-            {
-                $qty = $this->_getQty ($child);
-
-                $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
-
-                $this->_simpleProducts [$j] = $product;
-                $this->_productsQty [$j] = (int)$qty;
-                $j = $j + 1;
-            }
+            $qty =  $child->getTotalQty();
+            $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
+            $this->_simpleProducts [$j] = $product;
+            $this->_productsQty [$j] = (int)$qty;
+            $j = $j + 1;
+            
 
         }
 
@@ -671,21 +625,70 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
         $parentItem = $item->getParentItem ();
         $targetItem = !empty ($parentItem) && $parentItem->getId () > 0 ? $parentItem : $item;
-
+        //$this->_log("##START: " . $qty);
         if ($targetItem instanceof Mage_Sales_Model_Quote_Item)
         {
             $qty = $targetItem->getQty ();
+            //$this->_log("##PEGANDO QUANTIDADES: " . $qty);
         }
         elseif ($targetItem instanceof Mage_Sales_Model_Order_Item)
         {
             $qty = $targetItem->getShipped () ? $targetItem->getShipped () : $targetItem->getQtyInvoiced ();
+            //$this->_log("##PEGANDO QUANTIDADES2: " . $qty);
             if ($qty == 0) {
                 $qty = $targetItem->getQtyOrdered();
             }
+            //$this->_log("##PEGANDO QUANTIDADE3: " . $qty);
         }
 
         return $qty;
     }
 
+    /**
+     * Retrieve all visible items from request
+     *
+     * @param Mage_Shipping_Model_Rate_Request $request Mage request
+     *
+     * @return array
+     */
+    protected function _getRequestItems($request)
+    {
 
+        $allItems = $request->getAllItems();
+        $items = array();
+
+        foreach ( $allItems as $item ) {
+            if ( !$item->getParentItemId() ) {
+                $items[] = $item;
+            }
+        }
+
+        $items = $this->_loadBundleChildren($items);
+
+        return $items;
+    }
+    /**
+     * Filter visible and bundle children products.
+     *
+     * @param array $items Product Items
+     *
+     * @return array
+     */
+    protected function _loadBundleChildren($items) {
+        $visibleAndBundleChildren = array();
+        /* @var $item Mage_Sales_Model_Quote_Item */
+        foreach ($items as $item) {
+            $product = $item->getProduct();
+            $isBundle = ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE);
+            if ($isBundle) {
+                /* @var $child Mage_Sales_Model_Quote_Item */
+                foreach ($item->getChildren() as $child) {
+                    $visibleAndBundleChildren[] = $child;
+                }
+            } else {
+                $visibleAndBundleChildren[] = $item;
+            }
+        }
+        return $visibleAndBundleChildren;
+    }
 }
