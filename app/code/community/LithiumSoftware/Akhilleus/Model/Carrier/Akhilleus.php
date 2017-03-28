@@ -17,19 +17,19 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
     protected $_result = null;
 
-    protected $_value				= NULL; // Valor do pedido
-    protected $_weightType			= NULL; // Unidade de medida
-    protected $_weight				= NULL; // Peso total do pedido
-    protected $_length				= NULL; // Tamanho
-    protected $_height				= NULL; // Altura
-    protected $_width				= NULL; // Largura
-    protected $_diameter		    = NULL; // Diametro
-    protected $_title				= NULL; // Título do método de envio
-    protected $_from				= NULL; // CEP de origem
-    protected $_to					= NULL; // CEP de destino
+    protected $_value               = NULL; // Valor do pedido
+    protected $_weightType          = NULL; // Unidade de medida
+    protected $_weight              = NULL; // Peso total do pedido
+    protected $_length              = NULL; // Tamanho
+    protected $_height              = NULL; // Altura
+    protected $_width               = NULL; // Largura
+    protected $_diameter            = NULL; // Diametro
+    protected $_title               = NULL; // Título do método de envio
+    protected $_from                = NULL; // CEP de origem
+    protected $_to                  = NULL; // CEP de destino
     protected $_destCountry         = NULL; // IATA do pais destino
-    protected $_recipientDocument	= NULL; // CPF / CNPJ do destinatario
-    protected $_packageWeight		= NULL; // valor ajustado do pacote
+    protected $_recipientDocument   = NULL; // CPF / CNPJ do destinatario
+    protected $_packageWeight       = NULL; // valor ajustado do pacote
     protected $_showDelivery        = NULL; // Determina exibição de prazo de entrega
     protected $_addDeliveryDays     = NULL; // Adiciona n dias ao prazo de entrega
 
@@ -169,14 +169,14 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                     $shippingItem->Length = $this->getConfigData('default_length'); //16
                     $shippingItem->Width =  $this->getConfigData('default_width'); //11
                     $shippingItem->Height = $this->getConfigData('default_height'); //2
-                    $shippingItem->Weight = $this->getConfigData('default_width'); //2
+                    $shippingItem->Weight = $this->getConfigData('default_weight'); //2
                     
                 }
                 else{
                     $shippingItem->Length = ($productObj->getVolume_comprimento() > 0 ? $productObj->getVolume_comprimento() : $this->getConfigData('default_length') );
                     $shippingItem->Height = ($productObj->getVolume_altura() > 0 ? $productObj->getVolume_altura() : $this->getConfigData('default_height'));
                     $shippingItem->Width = ($productObj->getVolume_largura()>0 ? $productObj->getVolume_largura() : $this->getConfigData('default_width'));
-                    $shippingItem->Weight = ($productObj->getWeight()>0 ? $this->_fixWeight($productObj->getWeight()) : $this->getConfigData('default_width'));
+                    $shippingItem->Weight = ($productObj->getWeight()>0 ? $this->_fixWeight($productObj->getWeight()) : $this->getConfigData('default_weight'));
                 }
                 $shippingItem->Diameter = 0;
                 $shippingItem->SKU = $productObj->getSku();
