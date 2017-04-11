@@ -88,6 +88,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <validate>validate-number</validate>
                             <comment><![CDATA[Mínimo de 2 cm.]]></comment>
                         </default_height>
                         <default_length translate="label">
@@ -97,6 +98,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <validate>validate-number</validate>
                             <comment><![CDATA[Mínimo de 16 cm.]]></comment>
                         </default_length>
                         <default_width translate="label">
@@ -106,26 +108,25 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <validate>validate-number</validate>
                             <comment><![CDATA[Mínimo de 11 cm.]]></comment>
                         </default_width>
-                        <weight_type translate="label">
-                            <label>Formato do Peso</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>LithiumSoftware_Akhilleus_Model_Source_WeightType</source_model>
-                            <sort_order>20</sort_order>
+                        <default_weight translate="label">
+                            <label>Peso Padrão (KG)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Formato do peso dos produtos.</comment>
-                            <tooltip>O formato do peso irá implicar na maneira como o mesmo é cadastrado no produto, por
-                                exemplo, 1 Kg no formato "Kilo" será "1.000", já em "Gramas" será "1000.000".
-                            </tooltip>
-                        </weight_type>
+                            <validate>validate-number</validate>
+                            <comment><![CDATA[minimo 0.2 KG]]></comment>
+                        </default_weight>
+                        
                         <show_delivery translate="label">
                             <label>Exibir Prazo de Entrega</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
+                            <sort_order>15</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -147,6 +148,19 @@
                             <show_in_store>1</show_in_store>
                             <comment>Adicionará mais dias aos prazos de entrega fornecidos.</comment>
                         </add_delivery_days>
+                        <weight_type translate="label">
+                            <label>Formato do Peso</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>LithiumSoftware_Akhilleus_Model_Source_WeightType</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Formato do peso dos produtos.</comment>
+                            <tooltip>O formato do peso irá implicar na maneira como o mesmo é cadastrado no produto, por
+                                exemplo, 1 Kg no formato "Kilo" será "1.000", já em "Gramas" será "1000.000".
+                            </tooltip>
+                        </weight_type>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>

@@ -74,12 +74,14 @@
                 <msgprazo>%s - Em média %d dia(s)</msgprazo>
                 <!-- VOLUME -->
                 <use_default>1</use_default>
-                <altura_padrao>2</altura_padrao>
-                <comprimento_padrao>16</comprimento_padrao>
-                <largura_padrao>11</largura_padrao>
+                <default_height>2</default_height>
+                <default_length>16</default_length>
+                <default_width>11</default_width>
+                <default_weight>0.2</default_weight>
                 <altura_sent>2</altura_sent>
                 <comprimento_sent>16</comprimento_sent>
                 <largura_sent>11</largura_sent>
+                
 
                 <sort_order>0</sort_order>
                 <sallowspecific>0</sallowspecific>
