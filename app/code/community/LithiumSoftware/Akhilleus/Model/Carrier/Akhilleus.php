@@ -407,7 +407,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
      */
     protected function _checkZipCode(Mage_Shipping_Model_Rate_Request $request) {
         $this->_from = $this->_formatZip(Mage::getStoreConfig('shipping/origin/postcode', $this->getStore()));
-        $this->_to = $this->_formatZip($request->getDestPostcode());
+
 
         if ($request->getDestCountryId()) {
             $this->_destCountry = $request->getDestCountryId();
@@ -416,6 +416,10 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         }
 
         $this->_log('Country ID ' . $this->_destCountry);
+
+        if(!$this->_to && $this->_destCountry == 'BR'){
+            $this->_to = $this->_formatZip($request->getDestPostcode());
+        } else {$this->_to = $request->getDestPostcode();}
 
         if(!$this->_from){
             $this->_log('Erro com CEP de origem');
@@ -613,40 +617,56 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 continue;
             }
 
-            //VERIFICA SE O PRODUTO É "FILHO" DE UM BUNDLE
-            $parent_ids = Mage::getModel('bundle/product_type')->getParentIdsByChild($child->getProductId());
-
-            if(!empty($parent_ids))
+            $parentItem = $child->getParentItem ();
+            if(!empty ($parentItem))
             {
-                $product_bundle = Mage::getModel ('catalog/product')->load ($parent_ids[0]);
+                $this->_log('Parent:' . $parentItem->getId ());
 
-                $selections = $product_bundle->getTypeInstance(true)
-                    ->getSelectionsCollection($product_bundle->getTypeInstance(true)
-                        ->getOptionsIds($product_bundle), $product_bundle);
+                //VERIFICA SE O PRODUTO É "FILHO" DE UM BUNDLE
+                $parent_ids = Mage::getModel('bundle/product_type')->getParentIdsByChild($child->getProductId());
 
-                foreach($selections as $selection){
-                    if($product_id == $selection->getProductId())
-                    {
-                        $product = Mage::getModel ('catalog/product')->load ($selection->getProductId());
-                        $qty = $selection->getSelectionQty();
+                if(!empty($parent_ids))
+                {
+                    $product_bundle = Mage::getModel ('catalog/product')->load ($parent_ids[0]);
 
-                        $qty_bundle = 1;
-                        foreach ($items as $child) {
-                            if($parent_ids[0] == $child->getProductId ()){
-                                $qty_bundle= $this->_getQty ($child);
-                                break;
+                    $selections = $product_bundle->getTypeInstance(true)
+                        ->getSelectionsCollection($product_bundle->getTypeInstance(true)
+                            ->getOptionsIds($product_bundle), $product_bundle);
+
+                    foreach($selections as $selection){
+                        if($product_id == $selection->getProductId())
+                        {
+                            $product = Mage::getModel ('catalog/product')->load ($selection->getProductId());
+                            $qty = $selection->getSelectionQty();
+
+                            $qty_bundle = 1;
+                            foreach ($items as $child) {
+                                if($parent_ids[0] == $child->getProductId ()){
+                                    $qty_bundle= $this->_getQty ($child);
+                                    break;
+                                }
                             }
+
+                            //$this->_log("qty_bundle: " . $qty_bundle);
+
+                            $this->_simpleProducts [$j] = $product;
+                            $this->_productsQty [$j] = (int) $qty * $qty_bundle;
+                            $j = $j + 1;
+
+                            //$this->_log(json_encode($product->getData()));
+                            //$this->_log("Loop Selections qty: " . $qty);
                         }
-
-                        //$this->_log("qty_bundle: " . $qty_bundle);
-
-                        $this->_simpleProducts [$j] = $product;
-                        $this->_productsQty [$j] = (int) $qty * $qty_bundle;
-                        $j = $j + 1;
-
-                        //$this->_log(json_encode($product->getData()));
-                        //$this->_log("Loop Selections qty: " . $qty);
                     }
+                }
+                else
+                {
+                    $qty = $this->_getQty ($child);
+
+                    $product = Mage::getModel ('catalog/product')->load ($child->getProductId());
+
+                    $this->_simpleProducts [$j] = $product;
+                    $this->_productsQty [$j] = (int)$qty;
+                    $j = $j + 1;
                 }
             }
             else
@@ -659,7 +679,6 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $this->_productsQty [$j] = (int)$qty;
                 $j = $j + 1;
             }
-
         }
 
         return $this;
