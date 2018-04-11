@@ -514,7 +514,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         $invoiceNumber='';
         if ($order->hasInvoices()) {
             foreach ($order->getInvoiceCollection() as $inv) {
-                $invoiceNumber += $inv->getIncrementId() . '|';
+                $invoiceNumber .= $inv->getIncrementId() . '|';
             }
         }
         
