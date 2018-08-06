@@ -209,11 +209,14 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
                 $shippingItemArray[$count] = $shippingItem;
                 $count++;
             }
+            
+            $coupon = Mage::getSingleton('checkout/session')->getQuote()->getCouponCode();
 
             $service_param = array (
                 'quoteRequest' => array(
                     'Username' => $this->getConfigData('login'),
                     'Password' => $this->getConfigData('password'),
+                    'Coupom' => $coupon,
                     'SellerCEP' => $this->_from,
                     'RecipientCEP' => $this->_to,
                     'RecipientCountry' => $this->_destCountry,
