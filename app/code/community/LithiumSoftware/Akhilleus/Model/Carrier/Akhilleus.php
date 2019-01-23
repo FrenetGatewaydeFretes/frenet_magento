@@ -658,6 +658,7 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
 
                             //$this->_log(json_encode($product->getData()));
                             //$this->_log("Loop Selections qty: " . $qty);
+							break;
                         }
                     }
                 }
