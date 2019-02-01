@@ -1,0 +1,8 @@
+{
+    "name": "frenet/magento",
+    "type": "magento-module",
+    "description": "Magento Frenet - Gateway de fretes para e-commerce",
+    "require":{
+        "magento-hackathon/magento-composer-installer":"*"
+    }
+}

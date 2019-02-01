@@ -19,6 +19,25 @@
 
 * Acesse a área administrativa de sua loja e limpe o cache em: Sistema > Gerenciamento de Cache
 
+**Instalação Composer**
+**********************************************************************************************
+
+* Rode os comandos no seu terminal
+
+```
+$ composer config repositories.magento-frenet git git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+$ composer require frenet/magento dev-master
+```
+
+**Instalação Modman**
+**********************************************************************************************
+
+* Rode os comandos no seu terminal
+
+```
+$ modgit init
+$ modgit clone magento-frenet git@github.com:FrenetGatewaydeFretes/frenet_magento.git
+```
 **Configuração**
 **********************************************************************************************
 * Acesse a área administrativa de sua loja e configure a nova forma de entrega instalada: Sistema > Configuração > Formas de Entrega > Frenet - Gateway de Fretes (conforme imagem a seguir)
