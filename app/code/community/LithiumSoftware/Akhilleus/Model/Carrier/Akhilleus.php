@@ -117,7 +117,9 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
     protected function _getWebServicesQuoteReturn(Mage_Shipping_Model_Rate_Request $request)
     {
         $url    = $this->getConfigData('url_ws');
-        $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1, "cache_wsdl" => WSDL_CACHE_NONE));
+        $config = LithiumSoftware_Akhilleus_Helper_Data::SOAP_CLIENT_SETTINGS;
+        ini_set('default_socket_timeout', $config['connection_timeout']);
+        $client = new SoapClient($url, $config);
 
         try {
             if ($this->getConfigFlag('use_default'))
@@ -508,7 +510,10 @@ class LithiumSoftware_Akhilleus_Model_Carrier_Akhilleus
         }
 
         $url    = $this->getConfigData('url_ws');
-        $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
+        $config = LithiumSoftware_Akhilleus_Helper_Data::SOAP_CLIENT_SETTINGS;
+        ini_set('default_socket_timeout', $config['connection_timeout']);
+        $client = new SoapClient($url, $config);
+
         //$orderId = Mage::getModel("sales/order")->getCollection()->getLastItem()->getIncrementId();
         $order = Mage::getModel('sales/order')->load($orderId);
 

@@ -54,7 +54,9 @@ class LithiumSoftware_Akhilleus_Model_Observer  extends Mage_Core_Model_Abstract
         $url = Mage::getStoreConfig('carriers/akhilleus/url_ws');
 
         try {
-            $client = new SoapClient($url, array("soap_version" => SOAP_1_1,"trace" => 1));
+            $config = LithiumSoftware_Akhilleus_Helper_Data::SOAP_CLIENT_SETTINGS;
+            ini_set('default_socket_timeout', $config['connection_timeout']);
+            $client = new SoapClient($url, $config);
 
             $login = Mage::getStoreConfig('carriers/akhilleus/login');
             $password = Mage::getStoreConfig('carriers/akhilleus/password');
